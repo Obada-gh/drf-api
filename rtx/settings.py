@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-pi57%l+jl@o+&a4-109g+b2x)=wio%naqq9z@p@dvr6pb=ruup
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0',] # rmove it if you want to work without doker
+ALLOWED_HOSTS = [] # rmove it if you want to work without doker
 
 
 # Application definition
