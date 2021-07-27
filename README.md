@@ -116,5 +116,31 @@ docker-compose run web python manage.py migrate
 docker-compose run web python manage.py createsuperuser
 ```
 
+* permission:
+```
+in sitting:
+
+REST_FRAMEWORK = {
+    'DEFAUILT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
+
+make a file in app gpus named permissions.py put this code inside it :
+
+
+from rest_framework import permissions
+
+class IscompanyOrReadOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return request.user == obj.company
+
+
+
+
+```
+
 
 
