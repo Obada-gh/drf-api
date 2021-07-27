@@ -1,43 +1,120 @@
 Lab: Django REST Framework & Docker
-Overview
-Use Django REST Framework to create an API, then “containerize” it with Docker.
 
-Feature Tasks and Requirements
-Rebuild a custom version of Blog API demo project from scratch.
-Replace Blog and Post with your own application and model.
-Your model must have at least as many fields as demo’s model.
-Your model must have one field that is a foreign key to user.
-NOTE: You are not required to build any templates for this lab.
-Features - Docker
-NOTE Refer to the class demo for built out Dockerfile and docker-compose.yml examples.
-Update Dockerfile and docker-compose.yml if needed.
-Stretch Goals
-Research using a production server vs. the built in development server.
-Research using postgres instead of sqlite as database.
-Implementation Notes
-You’ll need to run a command to convert pyproject.toml dependencies to requirements.txt
-poetry export -f requirements.txt -o requirements.txt
+* to run the docker:
+```
+docker-compose up
+```
+* to run the docker without keeping the terminal buzy:
+```
+docker-compose up -d
+```
+* to install postgres:
+```
+brew install postgresql
+to start:
+pg_ctl -D /home/linuxbrew/.linuxbrew/var/postgres start
 
-If you get an allowed host error examine the bug details and update code as needed.
-When Docker installed and docker files are ready to go then run…
-$ docker-compose up
-To shut docker down enter ctrl+c
-You’ll learn a better way soon
-User Acceptance Tests
-Modify provided unit tests in demo to work for your project.
-Configuration
-Use poetry to initialize drf-api project.
+to make it start ez but did not work with me :) :
+echo 'alias pgstart="pg_ctl -D /home/linuxbrew/.linuxbrew/var/postgres start"' >> ~/.profile
+echo 'alias pgstop="pg_ctl -D /home/linuxbrew/.linuxbrew/var/postgres stop"' >> ~/.profile
+```
 
-$ mkdir drf-api
+* IN sitting add new database:
+```
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'HOST':'db',
+        'PORT': 5432,
+    }
+}
+```
 
-$ cd drf-api
+* in docker-compose.yml:
+add new service:
+```
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on: 
+      - db
+  
+  db:
+    image: postgres:11
 
-$ poetry init -n
+```
+* reset docker:
+```
+docker-compose down
+```
+then :
+``` 
+docker-compose up
+```
+* 
+```
+poetry add psycopg2
+```
+if error:
+```
+in sitting:
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST':'db',
+        'PORT': 5432,
+    }
+}
 
-$ poetry shell
+in docker-compose.yml:
 
-Then continue to build the Django project.
+version: '3.9'
 
-Use the drf-api folder as the root of your project’s git repository.
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
 
-Refer to Lab Submission Instructions for detailed instructions.
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on: 
+      - db
+
+in terminal:
+
+poetry add psycopg2-binary
+
+docker-compose up --build
+
+docker-compose run web python manage.py migrate
+
+
+
+
+
+```
+* create users:
+```
+docker-compose run web python manage.py createsuperuser
+```
+
+
+
