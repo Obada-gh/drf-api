@@ -142,5 +142,7 @@ class IscompanyOrReadOnly(permissions.BasePermission):
 
 ```
 
+I think i fixed it
+
 
 
